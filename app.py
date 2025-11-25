@@ -496,6 +496,7 @@ else:
 
     # ---------------- Text input + classification ----------------
     st.markdown("### Enter News Text")
+    classify = False
     with st.form("text_form"):
         text = st.text_area(
             "Paste news text here...",
