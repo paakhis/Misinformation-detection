@@ -507,9 +507,18 @@ else:
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-    if classify:
-        st.session_state.final_label = classify_with_gemini(text)
-        st.session_state.last_text = text
+if classify:
+    # Reset previous results automatically
+    st.session_state.running = False
+    st.session_state.simulation_done = False
+    st.session_state.final_label = None
+
+    # Update text and classify again
+    st.session_state.last_text = text
+    st.session_state.final_label = classify_with_gemini(text)
+
+    st.rerun()
+
 
     if st.session_state.final_label:
         indicator = {
