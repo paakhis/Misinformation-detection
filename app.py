@@ -8,10 +8,17 @@ import time
 import networkx as nx
 import matplotlib.pyplot as plt
 import nltk
-from nltk.corpus import stopwords
-nltk.download("stopwords", quiet=True)
 import google.generativeai as genai
 import json
+from nltk.corpus import stopwords
+
+nltk_packages = ["punkt", "stopwords"]
+for pkg in nltk_packages:
+    try:
+        nltk.data.find(f"tokenizers/{pkg}" if pkg == "punkt" else f"corpora/{pkg}")
+    except LookupError:
+        nltk.download(pkg)
+
 
 
 
