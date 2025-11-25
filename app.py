@@ -495,63 +495,73 @@ else:
         st.sidebar.empty()
 
     # ---------------- Text input + classification ----------------
-st.markdown("### Enter News Text")
+    st.markdown("### Enter News Text")
 
-with st.form("text_form"):
-    text = st.text_area(
-        "Paste news text here...",
-        st.session_state.last_text,
-        height=180
-    )
-
-    classify = st.form_submit_button("Analyze")
-
-    if classify:
-        # Reset previous state
-        st.session_state.running = False
-        st.session_state.final_label = None
-        st.session_state.simulation_done = False
-
-        # Classify new input
-        st.session_state.last_text = text
-        st.session_state.final_label = classify_with_gemini(text)
-
-        st.rerun()  # refresh UI with updated results
-
-# --- Show result (executed AFTER rerun) ---
-if st.session_state.final_label:
-    indicator = {
-        "Fake News": st.error,
-        "Real News": st.success,
-        "Uncertain": st.warning,
-    }[st.session_state.final_label]
-    indicator(f"Detected: **{st.session_state.final_label}**")
-
-# ---------------- Run simulation only if Fake News ----------------
-if st.session_state.final_label == "Fake News":
-
-    st.subheader("Fake News Spread Simulation")
-
-    if not st.session_state.running:
-        if st.button("Run Simulation"):
-            st.session_state.running = True
-            st.session_state.simulation_done = False
-            st.rerun()
-
-    else:
-        log_area = st.sidebar.empty()
-        plot_area = st.empty()
-
-        run_sir_simulation(
-            st.session_state.nodes,
-            st.session_state.inf,
-            st.session_state.rec,
-            st.session_state.start_node,
-            st.session_state.prop,
-            st.session_state.delay,
-            log_area,
-            plot_area,
+    with st.form("text_form"):
+        text = st.text_area(
+            "Paste news text here...",
+            st.session_state.last_text,
+            height=180
         )
 
-        st.session_state.running = False
-        st.session_state.simulation_done = True
+        classify = st.form_submit_button("Analyze")
+
+        if classify:
+            # Reset previous state
+            st.session_state.running = False
+            st.session_state.final_label = None
+            st.session_state.simulation_done = False
+
+            # Classify new input
+            st.session_state.last_text = text
+            st.session_state.final_label = classify_with_gemini(text)
+
+            st.rerun()  # refresh UI with updated results
+
+    # --- Show result (executed AFTER rerun) ---
+    if st.session_state.final_label:
+        indicator = {
+            "Fake News": st.error,
+            "Real News": st.success,
+            "Uncertain": st.warning,
+        }[st.session_state.final_label]
+        indicator(f"Detected: **{st.session_state.final_label}**")
+    # ---------------- Clear button ----------------
+    if st.button("Clear"):
+        st.session_state.update(
+            final_label=None,
+            last_text="",
+            running=False,
+            simulation_done=False,
+        )
+        st.rerun()
+
+
+    # ---------------- Run simulation only if Fake News ----------------
+    if st.session_state.final_label == "Fake News":
+
+        st.subheader("Fake News Spread Simulation")
+
+        if not st.session_state.running:
+            if st.button("Run Simulation"):
+                st.session_state.running = True
+                st.session_state.simulation_done = False
+                st.rerun()
+
+        else:
+            log_area = st.sidebar.empty()
+            plot_area = st.empty()
+
+            run_sir_simulation(
+                st.session_state.nodes,
+                st.session_state.inf,
+                st.session_state.rec,
+                st.session_state.start_node,
+                st.session_state.prop,
+                st.session_state.delay,
+                log_area,
+                plot_area,
+            )
+
+            st.session_state.running = False
+            st.session_state.simulation_done = True
