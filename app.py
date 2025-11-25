@@ -6,6 +6,9 @@ import numpy as np
 import random
 import time
 import networkx as nx
+import os
+import joblib
+import gdown
 import matplotlib.pyplot as plt
 import nltk
 import google.generativeai as genai
@@ -49,7 +52,23 @@ def get_top_nodes(G, count=10, mode="Hub"):
 # 3) Load ML Model Artifacts
 # ---------------------------
 @st.cache_resource(ttl=3600)
+
+@st.cache_resource
 def load_model():
+    files = {
+        "ensemble_model.pkl": "1eAVYb5vTqaqBZ2G3cQPZaePXz8wECWpN",
+        "tfidf_vectorizer.pkl": "1L4vBqZaMP8p5pRmY6dDXsblUsShmC2xd",
+        "numeric_scaler.pkl": "1UiYqfSkY1D4N8v6dn5HTc7RtcZUVz4nc"
+    }
+
+    for filename, file_id in files.items():
+        if not os.path.exists(filename):
+            gdown.download(
+                f"https://drive.google.com/uc?export=download&id={file_id}",
+                filename,
+                quiet=False
+            )
+
     ensemble = joblib.load("ensemble_model.pkl")
     tfidf = joblib.load("tfidf_vectorizer.pkl")
     scaler = joblib.load("numeric_scaler.pkl")
